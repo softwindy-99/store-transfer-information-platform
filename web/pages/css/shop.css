@@ -1,0 +1,97 @@
+/* shop */
+._form_input_address {
+	width: 50rem!important;
+	height: auto;
+}
+._form_input_title {
+	width: 25rem!important;
+	height: auto;
+}
+._form_textarea_discrib {
+	width: 50rem!important;
+	height: 10rem!important;
+}
+._div_concent {
+	width: 70rem;
+	height: 25rem;
+	margin: 1rem 0rem;
+}
+._div_image {
+	width: 35rem;
+	height: 25rem;
+	overflow: hidden;
+	float: left;
+}
+._div_image img{
+	width: 100%;
+	height: 100%;
+}
+._div_text {
+	width: 35rem;
+	height: 25rem;
+	float: left;
+}
+._div_text_id {
+	width: 34rem;
+	height: 2rem;
+	line-height: 2rem;
+	font-size: 1rem;
+	color: rgb(180,180,180);
+	margin: 0rem 0rem 1rem 1rem;
+	border-bottom: 1px solid rgb(220,220,220);
+}
+._div_text_red {
+	width: 33rem;
+	height: 5rem;
+	margin: 1rem 1rem 1rem 1rem;
+	
+}
+._div_text_red_item {
+	width: 10.5rem;
+	height: 5rem;
+	float: left;
+	border-right: 1px solid rgb(220,220,220);
+}
+._div_text_red_item_n {
+	width: 10.5rem;
+	height: 2.5rem;
+	float: left;
+	font-size: 1.5rem;
+	color: rgb(215,30,40);
+	line-height: 2.5rem;
+	text-align: center;
+}
+._div_text_red_item_t {
+	width: 10.5rem;
+	height: 2.5rem;
+	float: left;
+	font-size: 1rem;
+	color: rgb(100,100,100);
+	line-height: 2.5rem;
+	text-align: center;
+}
+._div_text_list {
+	width: 34rem;
+	height: auto;
+	border-top: 1px solid rgb(220,220,220);
+	margin: 0rem 0rem 1rem 1rem;
+	position: relative;
+	
+}
+._div_text_list_item {
+	width: auto;
+	height: auto;
+}
+._div_text_list_item_title {
+	width: 5rem;
+	height: auto;
+	float: left;
+	margin: 1rem 0rem 1rem 1rem;
+}
+._div_text_list_item_text {
+	width: 9rem;
+	height: auto;
+	float: left;
+	margin: 1rem 1rem 1rem 0rem;
+	color: rgb(80,80,80);
+}

@@ -1,0 +1,9 @@
+/* user_image_list */
+._table_td_url {
+	width: 50rem!important;
+	height: 20rem!important;
+}
+._table_td_url img{
+	width: auto;
+	height: 100%;
+}

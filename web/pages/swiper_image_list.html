@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>轮播图</title>
+		<link rel="stylesheet" href="./css/base.css" />
+		<link rel="stylesheet" href="./css/swiper_image_list.css" />
+		<script src="./js/vue.min.js" type="text/javascript" charset="UTF-8"></script>
+	</head>
+	<body>
+		<div class="main" id="main">
+			<div class="nav_left">
+				<div class="nav_left_logo">
+					<img src="./images/logo.png" />
+				</div>
+				<ul class="nav_left_list_main">
+					<li v-if="user_permission == 100 || user_permission == 101">信息审核
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_approval_list.html'">店铺信息审核</li>
+							<li onclick="window.location.href='./rent_approval_list.html'">求租信息审核</li>
+						</ul>
+					</li>
+					<li>信息管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_list.html'">店铺信息管理</li>
+							<li onclick="window.location.href='./rent_list.html'">求租信息管理</li>
+							<li onclick="window.location.href='./shop_upload.html'">店铺上传</li>
+							<li onclick="window.location.href='./rent_upload.html'">求租上传</li>
+						</ul>
+					</li>
+					<li v-if="user_permission == 100 || user_permission == 101">图片管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./user_image_list.html'">用户图片管理</li>
+							<li onclick="window.location.href='./swiper_image_list.html'">首页轮播图管理</li>
+							<li onclick="window.location.href='./upload_image.html'">图片上传</li>
+						</ul>
+					</li>
+					<li>账户管理
+						<ul class="nav_left_list_secondary">
+							<li v-if="user_permission == 100" onclick="window.location.href='./user_list.html'" >后台账户管理</li>
+							<li onclick="window.location.href='./user_self.html'">个人管理</li>
+						</ul>
+					</li>
+					<li>{{ username }}</li>
+					<li class="nav_left_out" onclick='document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 GMT";alert("已退出");location.reload();'>退出登录</li>
+				</ul>
+			</div>
+			<div class="content_right">
+				<div class="card">
+					<h1>轮播图列表</h1>
+					<table class="table">
+						<tr>
+							<td>图片ID</td>
+							<td>预览</td>
+							<td>目标链接</td>
+							<td></td>
+						</tr>
+						<tr v-for="i in swiper_list">
+							<td>{{ i.id }}</td>
+							<td class="_table_td_url"> <img v-bind:src="i.imageurl" /> </td>
+							<td class="_table_td_url">{{ i.targeturl }}</td>
+							<td class="table_operate" v-on:click="de(i.id)">删除</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var page_swiper_image_list = new Vue({
+			el:'#main',
+			data: {
+				username:"用户名",
+				user_permission:200,
+				swiper_list:[],
+			},
+			methods: {
+				//检查登录
+				check_login() {
+					var self = this;
+					var login_cookie = self.get_cookie("login");
+					if(login_cookie != null) {
+						if(self.check_cookie(login_cookie)) {
+							
+						}
+						else {
+							window.location.href = "./login.html";
+						}
+					}
+					else {
+						window.location.href = "./login.html";
+					}
+				},
+				
+				//获取本地指定名称的cookie值
+				get_cookie(name) {
+				    var str = document.cookie;
+					if(str != null) {
+						var arr = str.split("; ");
+						for(var i = 0; i < arr.length; i++) {
+						    var arr = arr[i].split("=");
+						    if(name == arr[0]) {
+						        return arr[1];
+						    }
+						}
+					}
+				    else {
+						return null;
+					}
+				},
+				
+				//检查cookie值的有效性
+				check_cookie(value) {
+					var xmlhttp = new XMLHttpRequest();
+					var data = "cookie=" + value;
+					xmlhttp.open("POST", "../requests_ajax/check_cookie.php", false);
+					xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xmlhttp.send(data);
+					var response = JSON.parse(xmlhttp.responseText);
+					if(response['status'] == 100) {
+						return true;
+					}
+					else {
+						return false;
+					}	
+				},
+				
+				//向服务器获取信息
+				get_infomation(name) {
+					var self = this;
+					switch(name) {
+						//获取用户名
+						case 'name':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.username = response.username;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_username.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取权限值
+						case 'permission':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.user_permission = response.user_permission;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_user_permission.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						//获取图片列表
+						case 'get_swiper_list':
+							self.image_list = Array();
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									for(var i=0; i<response.result.length; i++) {
+										var temp = Object();
+										temp['id'] = response.result[i].swiper_id;
+										temp['imageurl'] = response.result[i].swiper_imageurl;
+										temp['targeturl'] = response.result[i].swiper_targeturl;
+										self.swiper_list.push(temp);
+									}
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_swiper_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						default:
+							console.log("无效的操作");
+							break;
+					}
+					
+				},
+				//删除图片
+				de(id) {
+					var xmlhttp = new XMLHttpRequest();
+					var data = 'id=' + id;
+					xmlhttp.onreadystatechange = function() {
+						if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+							if (xmlhttp.response == true){
+								alert('删除成功');
+								window.location.href="swiper_image_list.html"
+							}
+							else {
+								alert('删除失败');
+								window.location.href="swiper_image_list.html"
+							}
+							
+						}
+					}
+					xmlhttp.open("POST", "../requests_ajax/delete_swiper.php", true);//异步post请求
+					xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xmlhttp.send(data);
+				}
+			},
+			created() {
+				this.check_login();
+				this.get_infomation('name');
+				this.get_infomation('permission');
+				this.get_infomation('get_swiper_list');
+			}
+		});
+	</script>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>需求列表</title>
+		<link rel="stylesheet" href="./css/base.css" />
+		<link rel="shortcut icon" href="./images/logo.ico"/>
+		<script src="./js/vue.min.js" type="text/javascript" charset="UTF-8"></script>
+	</head>
+	<body>
+		<div class="main" id="main">
+			<div class="nav_left">
+				<div class="nav_left_logo">
+					<img src="./images/logo.png" />
+				</div>
+				<ul class="nav_left_list_main">
+					<li v-if="user_permission == 100 || user_permission == 101">信息审核
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_approval_list.html'">店铺信息审核</li>
+							<li onclick="window.location.href='./rent_approval_list.html'">求租信息审核</li>
+						</ul>
+					</li>
+					<li>信息管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_list.html'">店铺信息管理</li>
+							<li onclick="window.location.href='./rent_list.html'">求租信息管理</li>
+							<li onclick="window.location.href='./shop_upload.html'">店铺上传</li>
+							<li onclick="window.location.href='./rent_upload.html'">求租上传</li>
+						</ul>
+					</li>
+					<li v-if="user_permission == 100 || user_permission == 101">图片管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./user_image_list.html'">用户图片管理</li>
+							<li onclick="window.location.href='./swiper_image_list.html'">首页轮播图管理</li>
+							<li onclick="window.location.href='./upload_image.html'">图片上传</li>
+						</ul>
+					</li>
+					<li>账户管理
+						<ul class="nav_left_list_secondary">
+							<li v-if="user_permission == 100" onclick="window.location.href='./user_list.html'" >后台账户管理</li>
+							<li onclick="window.location.href='./user_self.html'">个人管理</li>
+						</ul>
+					</li>
+					<li>{{ username }}</li>
+					<li class="nav_left_out" onclick='document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 GMT";alert("已退出");location.reload();'>退出登录</li>
+				</ul>
+			</div>
+			<div class="content_right">
+				<div class="card" >
+					<h2>求租信息列表</h2>
+					<p>共计 {{ list_total }} 条</p>
+					<p>按关键词搜索：<input v-model="text" /> <button v-on:click="search()">查询</button> <button v-on:click="search_down()">查已完结</button><p>
+					<table class="table">
+						<tr>
+							<td>ID</td>
+							<td>标题</td>
+							<td>城市</td>
+							<td>区域</td>
+							<td>地段</td>
+							<td>客户姓名</td>
+							<td>电话</td>
+							<td>操作</td>
+						</tr>
+						<tr v-for="i in rent_list_page">
+							<td>{{ i.id }}</td>
+							<td>{{ i.title }}</td>
+							<td>{{ i.city }}</td>
+							<td>{{ i.district }}</td>
+							<td>{{ i.zone }}</td>
+							<td>{{ i.name }}</td>
+							<td>{{ i.phone }}</td>
+							<td class="table_operate" v-on:click="window_goto(i.id)">管理</td>
+						</tr>
+					</table>
+					<p><b class="card_list_page_up" v-on:click="page_up()">上一页&nbsp;&nbsp;</b><b class="card_list_page_down" v-on:click="page_down()">下一页</b></p>
+					<p>当前第 {{ page_number }} 页 共计 {{ page_max }} 页</p>
+					<p>跳转至 <input class="card_list_input" v-model="page_number_goto"> 页&nbsp;&nbsp;<button class="card_list_button" v-on:click="page_goto(page_number_goto)">跳转</button></p>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var page_rent_approval_list = new Vue({
+			el:'#main',
+			data: {
+				username:"用户名",
+				user_permission:200,
+				list_total:0,//总条目
+				page_number:1,//当前页码
+				page_max:1,//最大页码
+				page_number_goto:1,//目标页码
+				rent_list: [],//总数据
+				rent_list_page: [],//当前页显示的数据
+				text:'',
+			},
+			methods: {
+				//检查登录
+				check_login() {
+					var self = this;
+					var login_cookie = self.get_cookie("login");
+					if(login_cookie != null) {
+						if(self.check_cookie(login_cookie)) {
+							
+						}
+						else {
+							window.location.href = "./login.html";
+						}
+					}
+					else {
+						window.location.href = "./login.html";
+					}
+				},
+				
+				//获取本地指定名称的cookie值
+				get_cookie(name) {
+				    var str = document.cookie;
+					if(str != null) {
+						var arr = str.split("; ");
+						for(var i = 0; i < arr.length; i++) {
+						    var arr = arr[i].split("=");
+						    if(name == arr[0]) {
+						        return arr[1];
+						    }
+						}
+					}
+				    else {
+						return null;
+					}
+				},
+				
+				//检查cookie值的有效性
+				check_cookie(value) {
+					var xmlhttp = new XMLHttpRequest();
+					var data = "cookie=" + value;
+					xmlhttp.open("POST", "../requests_ajax/check_cookie.php", false);
+					xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xmlhttp.send(data);
+					var response = JSON.parse(xmlhttp.responseText);
+					if(response['status'] == 100) {
+						return true;
+					}
+					else {
+						return false;
+					}	
+				},
+				
+				//向服务器获取信息
+				get_infomation(string) {
+					var self = this;
+					switch(string) {
+						//获取用户名
+						case 'name':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.username = response.username;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_username.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取权限值
+						case 'permission':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.user_permission = response.user_permission;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_user_permission.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取所有需求列表
+						case 'get_rent_list':
+							self.initialization_data();
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + this.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									for(var i=0; i<response.result.length; i++) {
+										var temp = Object();
+										temp['id'] = response.result[i].rent_id;
+										temp['title'] = response.result[i].rent_title;
+										temp['city'] = response.result[i].rent_city;
+										temp['district'] = response.result[i].rent_district;
+										temp['zone'] = response.result[i].rent_zone;
+										temp['name'] = response.result[i].rent_name;
+										temp['phone'] = response.result[i].rent_phone;
+										self.rent_list.push(temp);
+										self.list_total++;
+									}
+									self.initialization_table();
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_rent_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取关键词需求列表
+						case 'get_rent_list_key':
+							self.initialization_data();
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + this.get_cookie('login') + '&key=' + this.text;
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									for(var i=0; i<response.result.length; i++) {
+										var temp = Object();
+										temp['id'] = response.result[i].rent_id;
+										temp['title'] = response.result[i].rent_title;
+										temp['city'] = response.result[i].rent_city;
+										temp['district'] = response.result[i].rent_district;
+										temp['zone'] = response.result[i].rent_zone;
+										temp['name'] = response.result[i].rent_name;
+										temp['phone'] = response.result[i].rent_phone;
+										self.rent_list.push(temp);
+										self.list_total++;
+									}
+									self.initialization_table();
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_rent_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取所有已完结需求列表
+						case 'get_rent_list_down':
+							self.initialization_data();
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + this.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									for(var i=0; i<response.result.length; i++) {
+										var temp = Object();
+										temp['id'] = response.result[i].rent_id;
+										temp['title'] = response.result[i].rent_title;
+										temp['city'] = response.result[i].rent_city;
+										temp['district'] = response.result[i].rent_district;
+										temp['zone'] = response.result[i].rent_zone;
+										temp['name'] = response.result[i].rent_name;
+										temp['phone'] = response.result[i].rent_phone;
+										self.rent_list.push(temp);
+										self.list_total++;
+									}
+									self.initialization_table();
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_rent_down_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取关键词已完结需求列表
+						case 'get_rent_list_down_key':
+							self.initialization_data();
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + this.get_cookie('login') + '&key=' + this.text;
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									for(var i=0; i<response.result.length; i++) {
+										var temp = Object();
+										temp['id'] = response.result[i].rent_id;
+										temp['title'] = response.result[i].rent_title;
+										temp['city'] = response.result[i].rent_city;
+										temp['district'] = response.result[i].rent_district;
+										temp['zone'] = response.result[i].rent_zone;
+										temp['name'] = response.result[i].rent_name;
+										temp['phone'] = response.result[i].rent_phone;
+										self.rent_list.push(temp);
+										self.list_total++;
+									}
+									self.initialization_table();
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_rent_down_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						default:
+							console.log("无效的操作");
+							break;
+					}
+					
+				},
+				
+				//数据初始化
+				initialization_data() {
+					var self = this;
+					self.list_total = 0;
+					self.page_number = 0;
+					self.page_max = 0;
+					self.page_number_goto = 0;
+					self.rent_list = [];
+					self.rent_list_page = [];
+				},
+				
+				//表格初始化
+				initialization_table() {
+					var self = this;
+					if(self.list_total != 0) {
+						self.page_number = 1;
+						self.page_number_goto = 1;
+						var i = 0;
+						while(true) {
+							if (i != 10) {
+								if(self.rent_list[i] != null) {
+									var temp = Object();
+									temp['id'] = self.rent_list[i].id;
+									temp['title'] = self.rent_list[i].title;
+									temp['city'] = self.rent_list[i].city;
+									temp['district'] = self.rent_list[i].district;
+									temp['zone'] = self.rent_list[i].zone;
+									temp['name'] = self.rent_list[i].name;
+									temp['phone'] = self.rent_list[i].phone;
+									self.rent_list_page.push(temp);
+									i++;
+								}
+								else {
+									break;
+								}
+							}
+							else {
+								break;
+							}
+						}
+					}
+					else {
+						self.page_number = 0;
+					}
+					//设置最大页码
+					var temp = self.list_total / 10;
+					temp = parseInt(temp);
+					if(self.list_total % 10 > 0) {
+						temp++;
+						self.page_max = temp;
+					}
+					else {
+						self.page_max = temp;
+					}
+				},
+				
+				//切换上一页
+				page_up() {
+					var self = this;
+					if(this.page_number > 1) {
+						this.page_number--;
+						var i = (this.page_number - 1) * 10;
+						var j = i+10;//终点索引
+						self.rent_list_page = [];
+						while(true) {
+							if (i != j) {
+								if(self.rent_list[i] != null) {
+									var temp = Object();
+									temp['id'] = self.rent_list[i].id;
+									temp['title'] = self.rent_list[i].title;
+									temp['city'] = self.rent_list[i].city;
+									temp['district'] = self.rent_list[i].district;
+									temp['zone'] = self.rent_list[i].zone;
+									temp['name'] = self.rent_list[i].name;
+									temp['phone'] = self.rent_list[i].phone;
+									self.rent_list_page.push(temp);
+									i++;
+								}
+								else {
+									break;
+								}
+							}
+							else {
+								break;
+							}
+						}
+					}
+					else {
+						alert("超出页码范围");
+					}
+				},
+				
+				//切换下一页
+				page_down() {
+					var self = this;
+					if(this.page_number < this.page_max) {
+						this.page_number++;
+						var i = (this.page_number - 1) * 10;
+						var j = i+10;//终点索引
+						self.rent_list_page = [];
+						while(true) {
+							if (i != j) {
+								if(self.rent_list[i] != null) {
+									var temp = Object();
+									temp['id'] = self.rent_list[i].id;
+									temp['title'] = self.rent_list[i].title;
+									temp['city'] = self.rent_list[i].city;
+									temp['district'] = self.rent_list[i].district;
+									temp['zone'] = self.rent_list[i].zone;
+									temp['name'] = self.rent_list[i].name;
+									temp['phone'] = self.rent_list[i].phone;
+									self.rent_list_page.push(temp);
+									i++;
+								}
+								else {
+									break;
+								}
+							}
+							else {
+								break;
+							}
+						}
+					}
+					else {
+						alert("超出页码范围");
+					}
+				},
+				
+				//切换到指定页
+				page_goto(n) {
+					var self = this;
+					if(n >= 1 && n <= self.page_max) {
+						self.page_number = n;
+						var i = (self.page_number - 1) * 10;
+						var j = i+10;//终点索引
+						self.rent_list_page = [];
+						while(true) {
+							if (i != j) {
+								if(self.rent_list[i] != null) {
+									var temp = Object();
+									temp['id'] = self.rent_list[i].id;
+									temp['title'] = self.rent_list[i].title;
+									temp['city'] = self.rent_list[i].city;
+									temp['district'] = self.rent_list[i].district;
+									temp['zone'] = self.rent_list[i].zone;
+									temp['name'] = self.rent_list[i].name;
+									temp['phone'] = self.rent_list[i].phone;
+									self.rent_list_page.push(temp);
+									i++;
+								}
+								else {
+									break;
+								}
+							}
+							else {
+								break;
+							}
+						}
+					}
+					else {
+						alert("请输入正确的页码");
+					}
+				},
+				
+				//查询关键词信息
+				search() {
+					var self = this;
+					var str = self.text;
+					if (str == '') {
+						self.get_infomation('get_rent_list');
+					}
+					else {
+						self.get_infomation('get_rent_list_key');
+					}
+					
+				},
+				
+				//查询已转出
+				search_down() {
+					var self = this;
+					var str = self.text;
+					if (str == '') {
+						self.get_infomation('get_rent_list_down');
+					}
+					else {
+						self.get_infomation('get_rent_list_down_key');
+					}
+				},
+				
+				//跳转到目标网页
+				window_goto(rent_id) {
+					var url = './rent.php?id=' + rent_id +'';
+					window.location.href= url;
+				},
+			},
+			created() {
+				this.check_login();
+				this.get_infomation('name');
+				this.get_infomation('permission');
+				this.initialization_data();
+				this.search();
+			}
+		});
+	</script>
+</html>

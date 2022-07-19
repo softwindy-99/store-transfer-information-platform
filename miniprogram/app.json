@@ -1,0 +1,24 @@
+{
+    "pages": [
+        "pages/index/index",
+        "pages/search/search",
+        "pages/shop/shop",
+        "pages/shop_upload/shop_upload",
+        "pages/rent_upload/rent_upload",
+        "pages/rent/rent",
+        "pages/webkit/webkit"
+    ],
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#fff",
+        "navigationBarTitleText": "Weixin",
+        "navigationBarTextStyle": "black"
+    },
+    "permission": {
+        "scope.userLocation": {
+            "desc": "您的位置将会为您提供合适的店铺信息"
+        }
+    },
+    "style": "v2",
+    "sitemapLocation": "sitemap.json"
+}

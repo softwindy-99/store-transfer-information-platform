@@ -1,0 +1,196 @@
+<!--pages/shop_upload/shop_upload.wxml-->
+<view class="container">
+  <form class="form" bindsubmit="formSubmit">
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 所在城市</view>
+      <picker mode="region" bindchange="bindRegionChange" value="{{region}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{region[0]}}，{{region[1]}}，{{region[2]}}
+          
+        </view>
+        
+      </picker>
+      <input class="form-input" type="text" name="province" style="display: none;" value="{{region[0]}}"></input>
+      <input class="form-input" type="text" name="city" style="display: none;" value="{{region[1]}}"></input>
+      <input class="form-input" type="text" name="district" style="display: none;" value="{{region[2]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 商圈地段</view>
+      <picker mode="selector" bindchange="bindZoneSelector" value="{{zoneIndex}}" range="{{zoneList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{zoneList[zoneIndex]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="zone" style="display: none;" value="{{zoneList[zoneIndex]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 店铺地址</view>
+      <input class="form-input" type="text" name="address" placeholder="请输入您的商铺地址" value="{{address}}" bindinput="bindAddressInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 店铺面积（平米）</view>
+      <input class="form-input" type="text" name="area" placeholder="请输入" value="{{area}}" bindinput="bindAreaInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 经营行业</view>
+      <picker mode="multiSelector" bindchange="bindTypeSelector" bindcolumnchange="getTypeListTwo" value="{{typePick}}"
+        range="{{typeList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{typeList[0][typePick[0]]}} - {{typeList[1][typePick[1]]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="type_0" style="display: none;"
+        value="{{typeList[0][typePick[0]]}}"></input>
+      <input class="form-input" type="text" name="type_1" style="display: none;"
+        value="{{typeList[1][typePick[1]]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 租金</view>
+      <input class="form-input" type="number" name="monthly_rent" placeholder="面议请填0（单位：元/月）"
+      value="{{monthly_rent}}" bindinput="bindMonthlyRentInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">* 转让费</view>
+      <input class="form-input" type="number" name="transfer_fee" placeholder="面议请填0（单位：万元）"
+      value="{{transfer_fee}}" bindinput="bindTransferFeeInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 房源标题</view>
+      <input class="form-input" type="text" name="title" placeholder="请输入" value="{{title}}" bindinput="bindTitleInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 房源描述</view>
+      <textarea class="form-textarea" type="text" name="discrib" placeholder="如有其他需求，请在这里描述，没有则填无"
+        value="{{discrib}}" bindinput="bindDiscribInput"></textarea>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 店铺照片</view>
+      <!-- 图片选择 -->
+      <view wx:if="{{imageUrlList}}" bindtap="chooseImage" style="padding-left:10rpx;">{{text_image}}</view>
+      <view wx:for="{{imageUrlList}}" wx:key="item" class="image_div" style="background-image: url({{item}});" >
+      </view>
+    </view>
+    <view style="clear: both;"> </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 联系人</view>
+      <input class="form-input" type="text" name="owner_name" placeholder="请输入" value="{{owner_name}}" bindinput="bindOwnerNameInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title iconfont iconf-xinghao">* 联系电话</view>
+      <input class="form-input" type="number" name="owner_phone" placeholder="请输入" value="{{owner_phone}}" bindinput="bindOwnerPhoneInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">经营状态</view>
+      <picker mode="selector" bindchange="bindStatusSelector" value="{{statusIndex}}" range="{{statusList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{statusList[statusIndex]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="status" style="display: none;"
+        value="{{statusList[statusIndex]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">商铺类型</view>
+      <picker mode="selector" bindchange="bindShopTypeSelector" value="{{shopTypeIndex}}" range="{{shopTypeList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{shopTypeList[shopTypeIndex]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="type" style="display: none;"
+        value="{{shopTypeList[shopTypeIndex]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">楼层</view>
+      <picker mode="multiSelector" bindchange="bindShopFloorSelector" value="{{shopFloorIndexs}}"
+        range="{{shopFloorList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{shopFloorList[0][shopFloorIndexs[0]]}} 至 {{shopFloorList[1][shopFloorIndexs[1]]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="min_floor" style="display: none;"
+        value="{{shopFloorList[0][shopFloorIndexs[0]]}}"></input>
+      <input class="form-input" type="text" name="max_floor" style="display: none;"
+        value="{{shopFloorList[1][shopFloorIndexs[1]]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">是否临街</view>
+      <picker mode="selector" bindchange="bindIsStreetSelector" value="{{isStreetIndex}}" range="{{isStreetList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{isStreetList[isStreetIndex]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="is_street" style="display: none;"
+        value="{{isStreetList[isStreetIndex]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">面宽（米）</view>
+      <input class="form-input" type="number" name="width" placeholder="请输入" value="{{width}}" bindinput="bindWidthInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">层高（米）</view>
+      <input class="form-input" type="number" name="height" placeholder="请输入" value="{{height}}" bindinput="bindHeightInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">进深（米）</view>
+      <input class="form-input" type="number" name="depth" placeholder="请输入" value="{{depth}}" bindinput="bindDepthInput"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">押付方式</view>
+      <picker mode="multiSelector" bindchange="bindMethodSelector" value="{{methodIndexs}}" range="{{methodList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          押{{methodList[0][methodIndexs[0]]}} 付{{methodList[1][methodIndexs[1]]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="method_0" style="display: none;"
+        value="{{methodList[0][methodIndexs[0]]}}"></input>
+      <input class="form-input" type="text" name="method_1" style="display: none;"
+        value="{{methodList[1][methodIndexs[1]]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">剩余租期（月）</view>
+      <picker mode="selector" bindchange="bindTimeLeftSelector" value="{{timeLeftIndex}}" range="{{timeLeftList}}">
+        <view class="picker">
+          <icon class="arrow"></icon>
+          {{timeLeftList[timeLeftIndex]}}
+        </view>
+      </picker>
+      <input class="form-input" type="text" name="time_left" style="display: none;"
+        value="{{timeLeftList[timeLeftIndex]}}"></input>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">商铺配套</view>
+      <view class='list'>
+        <block wx:for="{{pts}}" wx:for-item="v" wx:key="k" wx:for-index="index">
+          <view class='li {{v.checked?"cur":""}}' data-index='{{index}}' data-value="{{v.value}}" bindtap='selPt'>
+            <label class='ti'>{{v.value}} </label>
+          </view>
+        </block>
+        <view wx:for="{{pts}}" wx:for-item="v" wx:key="k" wx:for-index="index" style="display: none;">
+          <checkbox name="{{v.name}}" checked="{{v.checked}}">{{v.value}}</checkbox>
+        </view>
+      </view>
+    </view>
+    <view class="form-item">
+      <view class="form-item-title">客流人群</view>
+      <view class='list'>
+        <block wx:for="{{kls}}" wx:for-item="v" wx:key="k" wx:for-index="index">
+          <view class='li {{v.checked?"cur":""}}' data-index='{{index}}' data-value="{{v.value}}" bindtap='selKl'>
+            <label class='ti'>{{v.value}} </label>
+          </view>
+        </block>
+        <view wx:for="{{pts}}" wx:for-item="v" wx:key="k" wx:for-index="index" style="display: none;">
+          <checkbox name="{{v.name}}" checked="{{v.checked}}">{{v.value}}</checkbox>
+        </view>
+      </view>
+    </view>
+    <view class="btn" bindtap="doSubmit">提交</view>
+  </form>
+</view>

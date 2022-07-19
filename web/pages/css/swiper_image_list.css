@@ -1,0 +1,10 @@
+/* swiper_image_list */
+._table_td_url {
+	width: 50rem!important;
+	height: 20rem!important;
+	word-break: break-all;
+}
+._table_td_url img{
+	width: auto;
+	height: 100%;
+}

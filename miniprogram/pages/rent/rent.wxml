@@ -1,0 +1,38 @@
+<!--pages/rent/rent.wxml-->
+<view class="container">
+  <view class="Shop_card_basic">
+    <view class="basic_item">
+      <view class="basic_item_title">标  题</view>
+      <view class="basic_item_info_two">{{rent_info.rent_title}}</view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">商  圈</view>
+      <view class="basic_item_info_two iconfont icon-weizhi">{{rent_info.rent_zone}}</view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">意向行业</view>
+      <view class="basic_item_info_two iconfont icon-weizhi">{{rent_info.rent_industry}}</view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">月租范围</view>
+      <view class="basic_item_info_two iconfont icon-weizhi">{{rent_info.rent_min_monthly_rent}} 至 {{rent_info.rent_max_monthly_rent}} 元/月</view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">面积范围</view>
+      <view class="basic_item_info_two iconfont icon-weizhi">{{rent_info.rent_min_area}}平米 至 {{rent_info.rent_max_area}} 平米</view>
+    </view>
+  </view>
+  <view class="Shop_card_basic">
+    <view class="basic_item2">
+      <icon class="iconfont icon-dian" style="color: red;font-size: 50rpx;"></icon>
+      <text>需求描述</text>
+    </view>
+    <view class="basic_info2">
+      <view>{{rent_info.rent_other}}</view>
+    </view>
+    <view class="basic_foot2">
+      <view>声明：本信息来自用户提供，如有侵权，请联系平台删除！</view>
+    </view>
+  </view>
+  <view class="foot_btn" bindtap="connectUs">联系平台</view>
+</view>

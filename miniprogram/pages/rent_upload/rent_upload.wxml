@@ -1,0 +1,32 @@
+<!--pages/rent_upload/rent_upload.wxml-->
+
+<view class="container">
+
+<view class="form-item-title">* 标题</view>
+<input class="form-input" placeholder="标题长度不超过30个字" maxlength="30" model:value="{{title}}" confirm-type="done" />
+<view class="form-item-title">* 省市区</view>
+<picker class="picker" mode="region" value="{{region}}" bindchange="BindRegionChange" >
+    <icon class="arrow"></icon>
+    {{region[0]}}，{{region[1]}}，{{region[2]}}
+</picker>
+<view class="form-item-title">* 商圈</view>
+<picker class="picker" mode="selector" range="{{zone_list}}" value="{{zone_list_index}}" bindchange="Bindchange_zone" >
+    
+<view> <icon class="arrow"></icon> {{zone_list[zone_list_index]}}</view>
+</picker>
+<view class="form-item-title">* 租金范围(单位:元/月)</view>
+<input class="form-input" model:value="{{min_rent}}" placeholder="最小租金"  type="number" confirm-type="done" /> 
+<view class="form-item-title">至</view>
+<input  class="form-input" model:value="{{max_rent}}" placeholder="最大租金" type="number" confirm-type="done" />  
+<view class="form-item-title">* 面积范围(单位:平方米)</view>
+<input  class="form-input" model:value="{{min_area}}" placeholder="最小面积" type="number"  confirm-type="done" />  
+<view class="form-item-title">至</view>
+<input  class="form-input" model:value="{{max_area}}" placeholder="最大面积" type="number" confirm-type="done" />  
+<view class="form-item-title">* 联系人</view>
+<input  class="form-input" model:value="{{name}}" placeholder="请填写联系人姓名" confirm-type="done" />  
+<view class="form-item-title">* 电话</view>
+<input  class="form-input" model:value="{{phone}}" placeholder="请填写电话" type="number"  confirm-type="done" />
+<view class="form-item-title">详细需求</view>
+<textarea class="form-textarea" model:value="{{other}}" placeholder="如有其他需求，请在这里描述，没有则填暂无"></textarea>
+<view class="btn" bindtap="doSubmit" >提交</view>
+</view>

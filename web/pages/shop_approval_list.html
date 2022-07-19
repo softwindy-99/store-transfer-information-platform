@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>待审核的店铺列表</title>
+		<link rel="stylesheet" href="./css/base.css" />
+		<link rel="shortcut icon" href="./images/logo.ico"/>
+		<script src="./js/vue.min.js" type="text/javascript" charset="UTF-8"></script>
+	</head>
+	<body>
+		<div class="main" id="main">
+			<div class="nav_left">
+				<div class="nav_left_logo">
+					<img src="./images/logo.png" />
+				</div>
+				<ul class="nav_left_list_main">
+					<li v-if="user_permission == 100 || user_permission == 101">信息审核
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_approval_list.html'">店铺信息审核</li>
+							<li onclick="window.location.href='./rent_approval_list.html'">求租信息审核</li>
+						</ul>
+					</li>
+					<li>信息管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_list.html'">店铺信息管理</li>
+							<li onclick="window.location.href='./rent_list.html'">求租信息管理</li>
+							<li onclick="window.location.href='./shop_upload.html'">店铺上传</li>
+							<li onclick="window.location.href='./rent_upload.html'">求租上传</li>
+						</ul>
+					</li>
+					<li v-if="user_permission == 100 || user_permission == 101">图片管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./user_image_list.html'">用户图片管理</li>
+							<li onclick="window.location.href='./swiper_image_list.html'">首页轮播图管理</li>
+							<li onclick="window.location.href='./upload_image.html'">图片上传</li>
+						</ul>
+					</li>
+					<li>账户管理
+						<ul class="nav_left_list_secondary">
+							<li v-if="user_permission == 100" onclick="window.location.href='./user_list.html'" >后台账户管理</li>
+							<li onclick="window.location.href='./user_self.html'">个人管理</li>
+						</ul>
+					</li>
+					<li>{{ username }}</li>
+					<li class="nav_left_out" onclick='document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 GMT";alert("已退出");location.reload();'>退出登录</li>
+				</ul>
+			</div>
+			<div class="content_right">
+				<div class="card" >
+					<h2>待审核的店铺信息列表</h2>
+					<p>共计 {{ list_total }} 条</p>
+					<table class="table">
+						<tr>
+							<td class="_table_td_id">ID</td>
+							<td class="_table_td_title">标题</td>
+							<td class="_table_td_address">店铺的地址</td>
+							<td class="_table_td_time">提交时间</td>
+							<td class="_table_td_name">客户姓名</td>
+							<td class="_table_td_phone">电话</td>
+							<td class="_table_td_operrate">操作</td>
+						</tr>
+						<tr v-for="i in shop_list_page">
+							<td>{{ i.id }}</td>
+							<td>{{ i.title }}</td>
+							<td>{{ i.address }}</td>
+							<td>{{ i.time }}</td>
+							<td>{{ i.owner_name }}</td>
+							<td>{{ i.owner_phone }}</td>
+							<td class="table_operate" v-on:click="window_goto(i.id)">审核</td>
+						</tr>
+					</table>
+					<p><b class="card_list_page_up" v-on:click="page_up()">上一页&nbsp;&nbsp;</b><b class="card_list_page_down" v-on:click="page_down()">下一页</b></p>
+					<p>当前第 {{ page_number }} 页 共计 {{ page_max }} 页</p>
+					<p>跳转至 <input class="card_list_input" v-model="page_number_goto"> 页&nbsp;&nbsp;<button class="card_list_button" v-on:click="page_goto(page_number_goto)">跳转</button></p>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var page_shop_approval_list = new Vue({
+			el:'#main',
+			data: {
+				username:"用户名",
+				user_permission:200,
+				list_total:0,//总条目
+				page_number:0,//当前页码
+				page_max:0,//最大页码
+				page_number_goto:0,//目标页码
+				shop_list: [],//总数据
+				shop_list_page: []//当前页显示的数据
+			},
+			methods: {
+				//检查登录
+				check_login() {
+					var self = this;
+					var login_cookie = self.get_cookie("login");
+					if(login_cookie != null) {
+						if(self.check_cookie(login_cookie)) {
+							
+						}
+						else {
+							window.location.href = "./login.html";
+						}
+					}
+					else {
+						window.location.href = "./login.html";
+					}
+				},
+				
+				//获取本地指定名称的cookie值
+				get_cookie(name) {
+				    var str = document.cookie;
+					if(str != null) {
+						var arr = str.split("; ");
+						for(var i = 0; i < arr.length; i++) {
+						    var arr = arr[i].split("=");
+						    if(name == arr[0]) {
+						        return arr[1];
+						    }
+						}
+					}
+				    else {
+						return null;
+					}
+				},
+				
+				//检查cookie值的有效性
+				check_cookie(value) {
+					var xmlhttp = new XMLHttpRequest();
+					var data = "cookie=" + value;
+					xmlhttp.open("POST", "../requests_ajax/check_cookie.php", false);
+					xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xmlhttp.send(data);
+					var response = JSON.parse(xmlhttp.responseText);
+					if(response['status'] == 100) {
+						return true;
+					}
+					else {
+						return false;
+					}	
+				},
+				
+				//向服务器获取信息
+				get_infomation(string) {
+					var self = this;
+					switch(string) {
+						//获取用户名
+						case 'name':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.username = response.username;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_username.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取权限值
+						case 'permission':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.user_permission = response.user_permission;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_user_permission.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取待审核的店铺列表
+						case 'shop_approval_list':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + this.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									self.initialization_data();
+									var response = JSON.parse(xmlhttp.responseText);
+									for(var i=0; i<response.result.length; i++) {
+										var temp = Object();
+										temp['id'] = response.result[i].shop_id;
+										temp['address'] = response.result[i].shop_address;
+										temp['time'] = response.result[i].shop_time;
+										temp['title'] = response.result[i].shop_title;
+										temp['owner_name'] = response.result[i].shop_owner_name;
+										temp['owner_phone'] = response.result[i].shop_owner_phone;
+										self.shop_list.push(temp);
+										self.list_total++;
+									}
+									self.initialization_table();
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_shop_approval_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						
+						//错误的参数
+						default:
+							console.log("无效的操作");
+							break;
+					}
+					
+				},
+				
+				//数据初始化
+				initialization_data() {
+					var self = this;
+					self.list_total = 0;
+					self.page_number = 0;
+					self.page_max = 0;
+					self.page_number_goto = 0;
+					self.shop_list = [];
+					self.shop_list_page = [];
+				},
+				
+				//表格初始化
+				initialization_table() {
+					var self = this;
+					if(self.list_total > 0) {
+						self.page_number = 1;
+						self.page_number_goto = 1;
+					}
+					var i = 0;
+					while(true) {
+						if (i != 10) {
+							if(self.shop_list[i] != null) {
+								var temp = Object();
+								temp['id'] = self.shop_list[i].id;
+								temp['address'] = self.shop_list[i].address;
+								temp['time'] = self.shop_list[i].time;
+								temp['title'] = self.shop_list[i].title;
+								temp['owner_name'] = self.shop_list[i].owner_name;
+								temp['owner_phone'] = self.shop_list[i].owner_phone;
+								self.shop_list_page.push(temp);
+								i++;
+							}
+							else {
+								break;
+							}
+						}
+						else {
+							break;
+						}
+					}
+					var temp = self.list_total / 10;
+					temp = parseInt(temp);
+					if(self.list_total % 10 > 0) {
+						temp++;
+						self.page_max = temp;
+					}
+					else {
+						self.page_max = temp;
+					}
+				},
+				
+				//切换上一页
+				page_up() {
+					var self = this;
+					if(this.page_number > 1) {
+						this.page_number--;
+						var i = (this.page_number - 1) * 10;
+						var j = i+10;//终点索引
+						self.shop_list_page = [];//清空当前页
+						while(true) {
+							if (i != j) {
+								if(self.shop_list[i] != null) {
+									var temp = Object();
+									temp['id'] = self.shop_list[i].id;
+									temp['address'] = self.shop_list[i].address;
+									temp['time'] = self.shop_list[i].time;
+									temp['title'] = self.shop_list[i].title;
+									temp['owner_name'] = self.shop_list[i].owner_name;
+									temp['owner_phone'] = self.shop_list[i].owner_phone;
+									self.shop_list_page.push(temp);
+									i++;
+								}
+								else {
+									break;
+								}
+							}
+							else {
+								break;
+							}
+						}
+					}
+					else {
+						alert("超出页码范围");
+					}
+				},
+				
+				//切换下一页
+				page_down() {
+					var self = this;
+					if(this.page_number < this.page_max) {
+						this.page_number++;
+						var i = (this.page_number - 1) * 10;
+						var j = i+10;//终点索引
+						self.shop_list_page = [];//清空当前页
+						while(true) {
+							if (i != j) {
+								if(self.shop_list[i] != null) {
+									var temp = Object();
+									temp['id'] = self.shop_list[i].id;
+									temp['address'] = self.shop_list[i].address;
+									temp['time'] = self.shop_list[i].time;
+									temp['title'] = self.shop_list[i].title;
+									temp['owner_name'] = self.shop_list[i].owner_name;
+									temp['owner_phone'] = self.shop_list[i].owner_phone;
+									self.shop_list_page.push(temp);
+									i++;
+								}
+								else {
+									break;
+								}
+							}
+							else {
+								break;
+							}
+						}
+					}
+					else {
+						alert("超出页码范围");
+					}
+				},
+				
+				//切换到指定页
+				page_goto(n) {
+					var self = this;
+					if(n >= 1 && n <= self.page_max) {
+						self.page_number = n;
+						var i = (self.page_number - 1) * 10;
+						var j = i+10;//终点索引
+						self.shop_list_page = [];//清空当前页
+						while(true) {
+							if (i != j) {
+								if(self.shop_list[i] != null) {
+									var temp = Object();
+									temp['id'] = self.shop_list[i].id;
+									temp['address'] = self.shop_list[i].address;
+									temp['time'] = self.shop_list[i].time;
+									temp['title'] = self.shop_list[i].title;
+									temp['owner_name'] = self.shop_list[i].owner_name;
+									temp['owner_phone'] = self.shop_list[i].owner_phone;
+									self.shop_list_page.push(temp);
+									i++;
+								}
+								else {
+									break;
+								}
+							}
+							else {
+								break;
+							}
+						}
+					}
+					else {
+						alert("请输入正确的页码");
+					}
+				},
+				
+				//跳转到目标网页
+				window_goto(shop_id) {
+					var url = './shop_approval.php?id=' + shop_id +'';
+					window.location.href = url;
+				},
+			},
+			created() {
+				this.check_login();
+				this.get_infomation('name');
+				this.get_infomation('permission');
+				this.get_infomation('shop_approval_list');
+				this.initialization_data();
+			}
+		});
+	</script>
+</html>

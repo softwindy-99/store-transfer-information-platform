@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>需求信息</title>
+		<link rel="stylesheet" href="./css/base.css" />
+		<link rel="stylesheet" href="./css/rent.css" />
+		<link rel="shortcut icon" href="./images/logo.ico"/>
+		<script src="./js/vue.min.js" type="text/javascript" charset="UTF-8"></script>
+	</head>
+	<body>
+		<div class="main" id="main">
+			<div class="nav_left">
+				<div class="nav_left_logo">
+					<img src="./images/logo.png" />
+				</div>
+				<ul class="nav_left_list_main">
+					<li v-if="user_permission == 100 || user_permission == 101">信息审核
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_approval_list.html'">店铺信息审核</li>
+							<li onclick="window.location.href='./rent_approval_list.html'">求租信息审核</li>
+						</ul>
+					</li>
+					<li>信息管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./shop_list.html'">店铺信息管理</li>
+							<li onclick="window.location.href='./rent_list.html'">求租信息管理</li>
+							<li onclick="window.location.href='./shop_upload.html'">店铺上传</li>
+							<li onclick="window.location.href='./rent_upload.html'">求租上传</li>
+						</ul>
+					</li>
+					<li v-if="user_permission == 100 || user_permission == 101">图片管理
+						<ul class="nav_left_list_secondary">
+							<li onclick="window.location.href='./user_image_list.html'">用户图片管理</li>
+							<li onclick="window.location.href='./swiper_image_list.html'">首页轮播图管理</li>
+							<li onclick="window.location.href='./upload_image.html'">图片上传</li>
+						</ul>
+					</li>
+					<li>账户管理
+						<ul class="nav_left_list_secondary">
+							<li v-if="user_permission == 100" onclick="window.location.href='./user_list.html'" >后台账户管理</li>
+							<li onclick="window.location.href='./user_self.html'">个人管理</li>
+						</ul>
+					</li>
+					<li>{{ username }}</li>
+					<li class="nav_left_out" onclick='document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 GMT";alert("已退出");location.reload();'>退出登录</li>
+				</ul>
+			</div>
+			<div class="content_right">
+				<div class="card">
+					<form action="../requests_form/request_rent_upload.php" method="post">
+						<h1>求租信息</h1>
+						<h2>基本信息</h2>
+						<input class="card_form_input_hidden" name="id" />
+						<p>
+							<b><span>*&nbsp;&nbsp;</span>标题：&nbsp;&nbsp;</b><input class="_form_input_title" name="title" required="required" />&nbsp;&nbsp;&nbsp;&nbsp;<i>标题应不超过30个汉字或60个英文字母</i>
+						</p>
+						<p>
+							<b><span>*&nbsp;&nbsp;</span>省(直辖市)：&nbsp;&nbsp;</b>
+							<select v-model="rent_info.province" v-on:change="changed_province()" name="province" required="required">
+								<option v-for="i in province_list">{{ i }}</option>
+							</select>&nbsp;&nbsp;&nbsp;&nbsp;
+							<b><span>*&nbsp;&nbsp;</span>市(直辖市)：</b>
+							<select v-model="rent_info.city" v-on:change="changed_city()" name="city" required="required" >
+								<option v-for="i in city_list">{{ i }}</option>
+							</select>&nbsp;&nbsp;&nbsp;&nbsp;
+							<b><span>*&nbsp;&nbsp;</span>区：</b>
+							<select v-model="rent_info.district" v-on:change="changed_district()" name="district" required="required" >
+								<option v-for="i in district_list">{{ i }}</option>
+							</select>&nbsp;&nbsp;&nbsp;&nbsp;
+						</p>
+						<p>
+							<b><span>*&nbsp;&nbsp;</span>商圈地段：&nbsp;&nbsp;</b>
+							<select v-model="rent_info.zone" name="zone" required="required">
+								<option v-for="i in zone_list">{{ i }}</option>
+							</select>&nbsp;&nbsp;&nbsp;&nbsp;
+						</p>
+						<p>
+							<b><span>*&nbsp;&nbsp;</span>面积范围：&nbsp;&nbsp;</b>
+							<input type="number" step="0.01" name="min_area" required="required" />
+							平米&nbsp;至&nbsp;
+							<input type="number" step="0.01" name="max_area" required="required" />
+							平米
+						</p>
+						<p>
+							<b><span>*&nbsp;&nbsp;</span>经营行业：&nbsp;&nbsp;</b>
+							<select v-model="type_0" v-on:change="changed_type()" name="type_0"  required="required">
+								<option v-for="i in type_0_list">{{ i }}</option>
+							</select>&nbsp;&nbsp;—&nbsp;&nbsp;
+							<select v-model="type_1" name="type_1" required="required">
+								<option v-for="i in type_1_list">{{ i }}</option>
+							</select>
+						</p>
+						<p>
+							<b><span>*&nbsp;&nbsp;</span>姓名：&nbsp;&nbsp;</b><input name="name" required="required" />
+							<b><span>*&nbsp;&nbsp;</span>电话：&nbsp;&nbsp;</b><input type="text" maxlength="11" step="1" name="phone" required="required" />
+						</p>
+						<h2>价格信息</h2>
+						<p>
+							<b><span>*&nbsp;&nbsp;</span>月租金范围：&nbsp;&nbsp;</b>
+							<input type="number" name="min_monthly_rent" required="required" />
+							&nbsp;元&nbsp;至
+							<input type="number" name="max_monthly_rent" required="required" />
+							&nbsp;元
+						</p>
+						
+						<h2>详细信息</h2>
+						<p><b>具体说明：&nbsp;&nbsp;</b></p>
+						<p><textarea class="_form_textarea_other" name="other" ></textarea></p>
+						<p>
+							<button type="submit">提交</button>
+							<button type="button" onclick="window.history.back()">返回</button>
+						</p>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		var page_rent = new Vue({
+			el:'#main',
+			data: {
+				username:"用户名",
+				user_permission:200,
+				rent_info:{province:"", city:"", district:"", zone:""},
+				//表单需要的信息
+				province_list:[],
+				city_list:[],
+				district_list:[],
+				zone_list:[],
+				type_0_list:[],
+				type_1_list:[],
+				type_0:"",
+				type_1:""
+			},
+			methods: {
+				//检查登录
+				check_login() {
+					var self = this;
+					var login_cookie = self.get_cookie("login");
+					if(login_cookie != null) {
+						if(self.check_cookie(login_cookie)) {
+							
+						}
+						else {
+							window.location.href = "./login.html";
+						}
+					}
+					else {
+						window.location.href = "./login.html";
+					}
+				},
+				
+				//获取本地指定名称的cookie值
+				get_cookie(name) {
+				    var str = document.cookie;
+					if(str != null) {
+						var arr = str.split("; ");
+						for(var i = 0; i < arr.length; i++) {
+						    var arr = arr[i].split("=");
+						    if(name == arr[0]) {
+						        return arr[1];
+						    }
+						}
+					}
+				    else {
+						return null;
+					}
+				},
+				
+				//检查cookie值的有效性
+				check_cookie(value) {
+					var xmlhttp = new XMLHttpRequest();
+					var data = "cookie=" + value;
+					xmlhttp.open("POST", "../requests_ajax/check_cookie.php", false);
+					xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xmlhttp.send(data);
+					var response = JSON.parse(xmlhttp.responseText);
+					if(response['status'] == 100) {
+						return true;
+					}
+					else {
+						return false;
+					}	
+				},
+				
+				//向服务器获取信息
+				get_infomation(string) {
+					var self = this;
+					switch(string) {
+						//获取用户名
+						case 'name':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.username = response.username;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_username.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//获取权限值
+						case 'permission':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									self.user_permission = response.user_permission;
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_user_permission.php", true);
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						
+						//获取省信息
+						case 'get_pronvince_list':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									console.log(response);
+									for(var i=0; i<response.result.length; i++) {
+										self.province_list.push(response.result[i]);
+									}
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_province_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						
+						//获取市信息
+						case 'get_city_list':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login') + '&province=' + self.rent_info.province;
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									console.log(response);
+									for(var i=0; i<response.result.length; i++) {
+										self.city_list.push(response.result[i]);
+									}
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_city_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						
+						//获取区信息
+						case 'get_district_list':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login') + '&province=' + self.rent_info.province + '&city=' + self.rent_info.city;
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									console.log(response);
+									for(var i=0; i<response.result.length; i++) {
+										self.district_list.push(response.result[i]);
+									}
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_district_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						
+						//获取商圈地段信息
+						case 'get_zone_list':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login') + '&province=' + self.rent_info.province + '&city=' + self.rent_info.city + '&district=' + self.rent_info.district;
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									console.log(response);
+									for(var i=0; i<response.result.length; i++) {
+										self.zone_list.push(response.result[i]);
+									}
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_zone_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;	
+						
+						//获取店铺类型0信息
+						case 'get_type_0_list':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login');
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									console.log(response);
+									for(var i=0; i<response.result.length; i++) {
+										self.type_0_list.push(response.result[i]);
+									}
+									
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_type_0_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+						
+						//获取店铺类型1信息
+						case 'get_type_1_list':
+							var xmlhttp = new XMLHttpRequest();
+							var data = 'cookie=' + self.get_cookie('login') +'&type_0=' + self.type_0;
+							xmlhttp.onreadystatechange = function() {
+								if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+									var response = JSON.parse(xmlhttp.responseText);
+									console.log(response);
+									for(var i=0; i<response.result.length; i++) {
+										self.type_1_list.push(response.result[i]);
+									}
+								}
+							}
+							xmlhttp.open("POST", "../requests_ajax/get_type_1_list.php", true);//异步post请求
+							xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+							xmlhttp.send(data);
+							break;
+							
+						//无效的参数
+						default:
+							console.log("无效的操作");
+							break;
+					}
+					
+				},
+				
+				//省变化
+				changed_province() {
+					var self = this;
+					self.rent_info.city = "";
+					self.rent_info.district = "";
+					self.rent_info.zone = "";
+					self.city_list = Array();
+					self.district_list = Array();
+					self.zone_list = Array();
+					self.get_infomation('get_city_list');
+				},
+				
+				//市变化
+				changed_city() {
+					var self = this;
+					self.rent_info.district = "";
+					self.rent_info.zone = "";
+					self.district_list = Array();
+					self.zone_list = Array();
+					self.get_infomation('get_district_list');
+				},
+				
+				//区变化
+				changed_district() {
+					var self = this;
+					self.rent_info.zone = "";
+					self.zone_list = Array();
+					self.get_infomation('get_zone_list');
+				},
+				
+				//店铺类型0变化
+				changed_type() {
+					var self = this;
+					self.type_1_list = Array();
+					self.type_1 = "不限";
+					self.get_infomation('get_type_1_list');
+				},
+			},
+			created() {
+				this.check_login();
+				this.get_infomation('name');
+				this.get_infomation('permission');
+				this.get_infomation('get_pronvince_list');
+				this.get_infomation('get_type_0_list');
+			}
+		});
+	</script>
+</html>

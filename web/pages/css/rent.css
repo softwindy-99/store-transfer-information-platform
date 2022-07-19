@@ -1,0 +1,9 @@
+/* rent */
+._form_input_title {
+	width: 25rem!important;
+	height: auto;
+}
+._form_textarea_other {
+	width: 50rem!important;
+	height: 10rem!important;
+}

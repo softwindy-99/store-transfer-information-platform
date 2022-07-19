@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>定好铺后台管理登录</title>
+		<link rel="stylesheet" href="./css/base.css" />
+		<link rel="stylesheet" href="./css/login.css" />
+		<link rel="shortcut icon" href="./images/logo.ico"/>
+		<script src="./js/vue.min.js" type="text/javascript" charset="UTF-8"></script>
+	</head>
+	<body>
+		<div class="login" id="login">
+			<div class="login_logo">
+				<img src="./images/logo.png" />
+			</div>
+			<form class="login_form" action="../requests_form/request_login.php" method="post">
+				<div class="login_form_item">
+					<h4>用户名</h4>
+					<input type="text" name="username"/>
+				</div>
+				<div class="login_form_item">
+					<h4>密码</h4>
+					<input type="password" name="password"/>
+				</div>
+				<div class="login_form_item">
+					<button type="submit">登录</button>
+				</div>
+			</form>
+			
+		</div>
+	</body>
+	<script>
+		var page_login = new Vue({
+			el:'#login',
+			data: {
+				
+			},
+			methods: {
+				//检查登录
+				check_login() {
+					var self = this;
+					var login_cookie = self.get_cookie("login");
+					if(login_cookie != null) {
+						if(self.check_cookie(login_cookie)) {
+							window.location.href = "./home.html";
+						}
+						else {
+							
+						}
+					}
+					else {
+						
+					}
+				},
+				
+				//获取本地指定名称的cookie值
+				get_cookie(name) {
+				    var str = document.cookie;
+					if(str != null) {
+						var arr = str.split("; ");
+						for(var i = 0; i < arr.length; i++) {
+						    var arr = arr[i].split("=");
+						    if(name == arr[0]) {
+						        return arr[1];
+						    }
+						}
+					}
+				    else {
+						return null;
+					}
+				},
+				
+				//检查cookie值的有效性
+				check_cookie(value) {
+					var xmlhttp = new XMLHttpRequest();
+					var data = "cookie=" + value;
+					xmlhttp.open("POST", "../requests_ajax/check_cookie.php", false);
+					xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xmlhttp.send(data);
+					var response = JSON.parse(xmlhttp.responseText);
+					if(response['status'] == 100) {
+						return true;
+					}
+					else {
+						return false;
+					}	
+				}
+			},
+			created() {
+				var self = this;
+				self.check_login();
+			}
+		});
+	</script>
+</html>

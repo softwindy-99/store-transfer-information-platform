@@ -1,0 +1,29 @@
+/* shop_approval_list */
+._table_td_id {
+	width: 1.5rem!important;
+	height: auto;
+}
+._table_td_title {
+	width: 24rem!important;
+	height: auto;
+}
+._table_td_address {
+	width: 26rem!important;
+	height: auto;
+}
+._table_td_time {
+	width: 8rem!important;
+	height: auto;
+}
+._table_td_name {
+	width: 4.5rem!important;
+	height: auto;
+}
+._table_td_phone {
+	width: 8rem!important;
+	height: auto;
+}
+._table_td_operrate {
+	width: 3rem!important;
+	height: auto;
+}

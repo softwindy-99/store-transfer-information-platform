@@ -1,0 +1,137 @@
+<!--index.wxml-->
+<view class="container">
+
+  <form>
+    <view class="Navigation_search">
+       <picker mode="region" value="{{region}}" bindchange="BindRegionChange" >
+         <view class="Navigation_search_picker">{{region[1]}}</view>
+       </picker>
+       <input placeholder="输入关键词进行搜索" model:value="{{search_text}}"></input>
+      <button bindtap="to_search">搜索</button>
+    </view>
+  </form>
+
+  <swiper class="Swiper_bar" indicator-dots="true" autoplay="true">
+    <swiper-item class="Swiper_bar_item" wx:for="{{swiper}}" wx:key="item" id="{{item.target_url}}"  bindtap="to_webkit">
+      <image src="{{item.image_url}}" ></image>
+    </swiper-item>
+  </swiper>
+
+  <view class="Release_information">
+    <view class="Release_information_shop">
+      <view class="Release_information_shop_button" bindtap="to_shop_upload">
+        发布店铺信息
+        <view class="Release_information_shop_button_icon">
+          <image src="../../images/plus_shop.svg"></image>
+        </view>
+      </view>
+      <view class="Release_information_shop_text">
+        <view>• 真实房源</view>
+        <view>• 所见即真</view>
+      </view>
+    </view>
+    <view class="Release_information_rent">
+      <view class="Release_information_rent_button" bindtap="to_rent_upload">
+        我要找店
+        <view class="Release_information_rent_button_icon">
+          <image src="../../images/plus_shop.svg"></image>
+        </view>
+      </view>
+      <view class="Release_information_rent_text">
+        <view>• 专业匹配</view>
+        <view>• 贴心服务</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="Advertisement_information">
+    <view class="Advertisement_information_title">为您推荐</view>
+    <view class="Advertisement_information_tab">
+      <view style="color: {{shop_color}};background-color:{{shop_b_color}};" bindtap="print_list_shop">旺铺转让</view>
+      <view style="color: {{rent_color}};background-color:{{rent_b_color}};" bindtap="print_list_rent">找店信息</view>
+    </view>
+    <view class="Advertisement_information_picker">
+      <picker mode="multiSelector" range="{{industry_list}}" value="{{industry_list_index}}" bindcolumnchange="BindColumnChange" bindchange="BindMultiPickerChange">
+        <view class="Advertisement_information_picker_item">{{advertisement_information_picker_text_list[0]}}</view>
+      </picker>
+      <picker mode="selector" range="{{zone_list}}" value="{{zone_list_index}}" bindchange="Bindchange_zone">
+        <view class="Advertisement_information_picker_item">{{advertisement_information_picker_text_list[1]}}</view>
+      </picker>
+      <picker mode="selector" range="{{area_list}}" value="{{area_list_index}}" bindchange="Bindchange_area">
+        <view class="Advertisement_information_picker_item">{{advertisement_information_picker_text_list[2]}}</view>
+      </picker>
+      <picker mode="selector" range="{{more_list}}" value="{{more_list_index}}" bindchange="Bindchange_more">
+        <view class="Advertisement_information_picker_item">{{advertisement_information_picker_text_list[3]}}</view>
+      </picker>
+    </view>
+    <view class="Advertisement_shop_list" style="display: {{display_shop}};">
+      <view class="Advertisement_shop_list_item" bindtap="to_shop" wx:for="{{shop_advertise_list}}" wx:key="item" id="{{item.id}}"  >
+        <view class="Advertisement_shop_list_item_image">
+          <image src="{{item.image_url}}"></image>
+        </view>
+        <view class="Advertisement_shop_list_item_text">
+          <view class="Advertisement_shop_list_item_text_title">{{item.title}}</view>
+          <view class="Advertisement_shop_list_item_text_area">面积：{{item.area}}平米</view>
+          <view wx:if="{{item.monthly_rent != '0'}}" class="Advertisement_shop_list_item_text_monthly_rent">月租：{{item.monthly_rent}}元</view>
+          <view wx:else class="Advertisement_shop_list_item_text_monthly_rent">月租：面议</view>
+          <view wx:if="{{item.transfer_fee != '0'}}" class="Advertisement_shop_list_item_text_transfer_fee">转让费：{{item.transfer_fee}}万</view>
+          <view wx:else class="Advertisement_shop_list_item_text_transfer_fee">转让费：面议</view>
+        </view>
+      </view>
+    </view>
+    <view class="Advertisement_rent_list" style="display: {{display_rent}};">
+      <view class="Advertisement_rent_list_item" bindtap="to_rent" wx:for="{{rent_advertise_list}}" wx:key="item" id="{{item.id}}" >
+        <view class="Advertisement_rent_list_item_text">
+          <view class="Advertisement_rent_list_item_title">求租·{{item.title}}</view>
+          <view class="Advertisement_rent_list_item_other">{{item.other}}</view>
+        </view>
+        <view class="Advertisement_rent_list_item_area">{{item.min_area}}㎡-{{item.max_area}}㎡</view>
+      </view>
+    </view>
+  </view>
+
+</view>
+<view class="cover" bindtap="close_cover" style="display: {{cover_display}};">
+  <view class="Release_information_cover">
+    <view class="Release_information_shop">
+      <view class="Release_information_shop_button" bindtap="to_shop_upload">
+        发布店铺信息
+        <view class="Release_information_shop_button_icon">
+          <image src="../../images/plus_shop.svg"></image>
+        </view>
+      </view>
+      <view class="Release_information_shop_text">
+        <view>• 真实房源</view>
+        <view>• 所见即真</view>
+      </view>
+    </view>
+    <view class="Release_information_rent">
+      <view class="Release_information_rent_button" bindtap="to_rent_upload">
+        我要找店
+        <view class="Release_information_rent_button_icon">
+          <image src="../../images/plus_shop.svg"></image>
+        </view>
+      </view>
+      <view class="Release_information_rent_text">
+        <view>• 专业匹配</view>
+        <view>• 贴心服务</view>
+      </view>
+    </view>
+</view>
+</view>
+  <view class="Navigation_bar">
+    <view class="Navigation_bar_item">
+      <image src="../../images/home.svg"></image>
+      <text>首页</text>
+    </view>
+    <view class="Navigation_bar_item" bindtap="open_cover">
+      <image src="../../images/plus.svg"></image><!--null image-->
+      <text>发布</text>
+    </view>
+    <view class="Navigation_bar_item" bindtap="to_search">
+      <image src="../../images/search.svg"></image>
+      <text>查找</text>
+    </view>
+  </view>
+
+

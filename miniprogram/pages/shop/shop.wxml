@@ -1,0 +1,98 @@
+<!--pages/shop/shop.wxml-->
+<view class="container">
+  <swiper class="Swiper_bar" indicator-dots="true" autoplay="true">
+    <swiper-item class="Swiper_bar_item" wx:for="{{shop_image}}" wx:key="item">
+      <image src="{{item}}"></image>
+    </swiper-item>
+  </swiper>
+  <view class="Shop_card_index">
+    <view class="shop_title">{{shop_info.shop_title}}</view>
+    <view class="shop_id">(ID:{{shop_info.shop_id}})</view>
+    <view class="shop_main_info">
+      <view class="shop_main_info_item">
+        <view class="shop_main_info_item_info" wx:if="{{shop_info.shop_monthly_rent != '0'}}"><text class="strong">{{shop_info.shop_monthly_rent}}</text> 元/月</view>
+        <view class="shop_main_info_item_info" wx:else>面议</view>
+        <view class="shop_main_info_item_desc">租金</view>
+      </view>
+      <view class="shop_main_info_item">
+        <view class="shop_main_info_item_info"><text class="strong">{{shop_info.shop_area}}</text> m<sup>2</sup></view>
+        <view class="shop_main_info_item_desc">面积</view>
+      </view>
+      <view class="shop_main_info_item">
+        <view class="shop_main_info_item_info" wx:if="{{shop_info.shop_transfer_fee != '0'}}"><text class="strong">{{shop_info.shop_transfer_fee}}</text> 万元</view>
+        <view class="shop_main_info_item_info" wx:else>面议</view>
+        <view class="shop_main_info_item_desc">转让费</view>
+      </view>
+    </view>
+  </view>
+  <view class="Shop_card_basic">
+    <view class="basic_item">
+      <view class="basic_item_title">经营行业</view>
+      <view class="basic_item_info_two">{{shop_info.shop_industry}}</view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">位  置</view>
+      <view class="basic_item_info_two iconfont icon-weizhi">{{shop_info.shop_address}}</view>
+    </view>
+    <view class="basic_item_two">
+      <view class="basic_item">
+        <view class="basic_item_title">类  型</view>
+        <view class="basic_item_info">{{shop_info.shop_type}}</view>
+      </view>
+      <view class="basic_item">
+        <view class="basic_item_title">押付方式</view>
+        <view class="basic_item_info">{{shop_info.shop_method}}</view>
+      </view>
+    </view>
+    <view class="basic_item_two">
+      <view class="basic_item">
+        <view class="basic_item_title">楼  层</view>
+        <view class="basic_item_info" wx:if="{{shop_info.shop_min_floor == shop_info.shop_max_floor}}">{{shop_info.shop_min_floor}}</view>
+        <view class="basic_item_info" wx:else>{{shop_info.shop_min_floor}}至{{shop_info.shop_max_floor}}</view>
+      </view>
+      <view class="basic_item">
+        <view class="basic_item_title">剩余租期</view>
+        <view class="basic_item_info" wx:if="{{parseInt(shop_info.shop_time_left)}}">{{shop_info.shop_time_left}}</view>
+        <view class="basic_item_info" wx:else>无</view>
+      </view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">经营状态</view>
+      <view class="basic_item_info_two">{{shop_info.shop_status}}</view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">规  格</view>
+      <view class="basic_item_info_two" wx:if="{{parseInt(shop_info.shop_depth) > 0 || parseInt(shop_info.shop_width) > 0 || parseInt(shop_info.shop_height) > 0}}">
+        <text wx:if="{{parseInt(shop_info.shop_depth) > 0}}">进深{{shop_info.shop_depth}}m </text>
+        <text wx:if="{{parseInt(shop_info.shop_width) > 0}}">门宽{{shop_info.shop_width}}m </text>
+        <text wx:if="{{parseInt(shop_info.shop_height) > 0}}">层高{{shop_info.shop_height}}m </text>
+      </view>
+      <view class="basic_item_info_two" wx:else>
+        暂无数据
+      </view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">客流人群</view>
+      <view class="basic_item_info_two" wx:if="{{shop_info.customer_population}}">{{shop_info.customer_population}}</view>
+      <view class="basic_item_info_two" wx:else>暂无数据</view>
+    </view>
+    <view class="basic_item">
+      <view class="basic_item_title">配套设施</view>
+      <view class="basic_item_info_two" wx:if="{{shop_info.supporting_facilities}}">{{shop_info.supporting_facilities}}</view>
+      <view class="basic_item_info_two" wx:else>暂无数据</view>
+    </view>
+  </view>
+  <view class="Shop_card_basic">
+    <view class="basic_item2">
+      <icon class="iconfont icon-dian" style="color: red;font-size: 50rpx;"></icon>
+      <text>房源描述</text>
+    </view>
+    <view class="basic_info2">
+      <text>{{shop_info.shop_discrib}}</text>
+    </view>
+    <view class="basic_foot2">
+      <view>声明：本信息来自用户提供，如有侵权，请联系平台删除！</view>
+    </view>
+  </view>
+  <view class="foot_btn" bindtap="connectUs">联系平台</view>
+</view>
